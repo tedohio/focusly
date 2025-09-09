@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -116,7 +116,7 @@ export default function OnboardingPage() {
   });
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const router = useRouter();
+  // const router = useRouter();
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
@@ -297,18 +297,18 @@ export default function OnboardingPage() {
     setDeleteConfirmId(null);
   };
 
-  const handleFocusAreaDragEnd = (event: any) => {
+  const handleFocusAreaDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = focusAreas.findIndex((fa) => fa.id === active.id);
       const newIndex = focusAreas.findIndex((fa) => fa.id === over.id);
       setFocusAreas(arrayMove(focusAreas, oldIndex, newIndex));
     }
   };
 
-  const handleMonthlyGoalDragEnd = (event: any) => {
+  const handleMonthlyGoalDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = monthlyGoals.findIndex((mg) => mg.id === active.id);
       const newIndex = monthlyGoals.findIndex((mg) => mg.id === over.id);
       setMonthlyGoals(arrayMove(monthlyGoals, oldIndex, newIndex));
@@ -321,9 +321,9 @@ export default function OnboardingPage() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Let's talk about you</CardTitle>
+              <CardTitle>Let&apos;s talk about you</CardTitle>
               <CardDescription>
-                What's your long-term goal? Be specific about what you want to achieve.
+                What&apos;s your long-term goal? Be specific about what you want to achieve.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -489,7 +489,7 @@ export default function OnboardingPage() {
             <CardHeader>
               <CardTitle>Welcome to Focusly!</CardTitle>
               <CardDescription>
-                You're all set up. Here's your daily loop:
+                You&apos;re all set up. Here&apos;s your daily loop:
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -497,7 +497,7 @@ export default function OnboardingPage() {
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">1</div>
                   <div>
-                    <h3 className="font-medium">Today's To-Dos</h3>
+                    <h3 className="font-medium">Today&apos;s To-Dos</h3>
                     <p className="text-sm text-gray-600">Execute on your priorities with drag-to-reorder</p>
                   </div>
                 </div>
@@ -512,13 +512,13 @@ export default function OnboardingPage() {
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">3</div>
                   <div>
                     <h3 className="font-medium">Reflect</h3>
-                    <p className="text-sm text-gray-600">What went well? What didn't? How can you improve?</p>
+                    <p className="text-sm text-gray-600">What went well? What didn&apos;t? How can you improve?</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">4</div>
                   <div>
-                    <h3 className="font-medium">Create Tomorrow's To-Dos</h3>
+                    <h3 className="font-medium">Create Tomorrow&apos;s To-Dos</h3>
                     <p className="text-sm text-gray-600">Plan your next day by moving incomplete tasks</p>
                   </div>
                 </div>
@@ -543,7 +543,7 @@ export default function OnboardingPage() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Welcome to Focusly</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Let's set up your goals and focus areas
+            Let&apos;s set up your goals and focus areas
           </p>
         </div>
 

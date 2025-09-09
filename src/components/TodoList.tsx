@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -21,7 +21,7 @@ interface Todo {
   done: boolean;
   order: number;
   forDate: string;
-  dueDate?: string;
+  dueDate?: string | null;
 }
 
 interface TodoListProps {
@@ -291,10 +291,10 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
     });
   };
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = todos.findIndex((todo) => todo.id === active.id);
       const newIndex = todos.findIndex((todo) => todo.id === over.id);
       

@@ -13,14 +13,14 @@ export const createClientComponentClient = () => {
 export const createServerComponentClient = () => {
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
+      get(_name: string) {
         // This will be handled by the middleware
         return undefined;
       },
-      set(name: string, value: string, options: { [key: string]: any }) {
+      set(_name: string, _value: string, _options: { [key: string]: unknown }) {
         // This will be handled by the middleware
       },
-      remove(name: string, options: { [key: string]: any }) {
+      remove(_name: string, _options: { [key: string]: unknown }) {
         // This will be handled by the middleware
       },
     },

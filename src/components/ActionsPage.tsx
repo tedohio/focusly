@@ -1,19 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { CheckSquare, FileText, Target, Calendar } from 'lucide-react';
-import { getNote, createNote } from '@/app/(main)/actions/notes';
-import { getReflection, createReflection } from '@/app/(main)/actions/reflections';
+import { FileText, Target, Calendar } from 'lucide-react';
+import { getNote } from '@/app/(main)/actions/notes';
+import { getReflection } from '@/app/(main)/actions/reflections';
 import { getTodos } from '@/app/(main)/actions/todos';
 import { getToday, getTomorrow } from '@/lib/date';
-import { toast } from 'sonner';
 import NoteEditor from './NoteEditor';
 import ReflectionForm from './ReflectionForm';
-import TodoList from './TodoList';
 import TomorrowPlanner from './TomorrowPlanner';
 
 interface ActionsPageProps {
@@ -22,7 +19,7 @@ interface ActionsPageProps {
 
 export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const today = getToday(timezone);
   const tomorrow = getTomorrow(timezone);
 
@@ -59,13 +56,13 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
     {
       id: 'reflect',
       title: 'Reflect',
-      description: 'What went well? What didn\'t? How can you improve?',
+      description: 'What went well? What didn&apos;t? How can you improve?',
       icon: Target,
       completed: !!(todayReflection?.whatWentWell || todayReflection?.whatDidntGoWell || todayReflection?.improvements),
     },
     {
       id: 'tomorrow',
-      title: 'Create Tomorrow\'s To-Dos',
+      title: 'Create Tomorrow&apos;s To-Dos',
       description: 'Plan your next day by moving incomplete tasks',
       icon: Calendar,
       completed: incompleteTodayTodos.length === 0 || tomorrowTodos.length > 0,
@@ -131,7 +128,7 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Daily Actions</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Your daily loop: Take Notes → Reflect → Create Tomorrow's To-Dos
+          Your daily loop: Take Notes → Reflect → Create Tomorrow&apos;s To-Dos
         </p>
       </div>
 

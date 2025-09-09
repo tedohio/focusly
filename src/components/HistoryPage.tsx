@@ -130,7 +130,7 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                         )}
                         {reflection.whatDidntGoWell && (
                           <div className="text-sm text-blue-700 mt-1">
-                            <strong>What didn't go well:</strong> {reflection.whatDidntGoWell}
+                            <strong>What didn&apos;t go well:</strong> {reflection.whatDidntGoWell}
                           </div>
                         )}
                         {reflection.improvements && (
@@ -176,7 +176,7 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                         )}
                         {reflection.whatDidntGoWell && (
                           <div className="text-sm text-gray-700 mt-1">
-                            <strong>What didn't go well:</strong> {reflection.whatDidntGoWell}
+                            <strong>What didn&apos;t go well:</strong> {reflection.whatDidntGoWell}
                           </div>
                         )}
                         {reflection.improvements && (

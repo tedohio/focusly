@@ -30,7 +30,7 @@ export default function LoginPage() {
       } else {
         toast.success('Check your email for the login link!');
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -51,7 +51,7 @@ export default function LoginPage() {
       if (error) {
         toast.error(error.message);
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);

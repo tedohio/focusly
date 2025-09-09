@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -221,10 +221,10 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
     setDeleteConfirmId(null);
   };
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = goals.findIndex((goal) => goal.id === active.id);
       const newIndex = goals.findIndex((goal) => goal.id === over.id);
       
@@ -243,7 +243,7 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
           <DialogHeader>
             <DialogTitle>Monthly Review</DialogTitle>
             <DialogDescription>
-              It's time to reflect on this month and plan for next month. Here are your current goals and priorities.
+              It&apos;s time to reflect on this month and plan for next month. Here are your current goals and priorities.
             </DialogDescription>
           </DialogHeader>
           
@@ -252,7 +252,7 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
             {currentMonthGoals.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Current Month's Goals</CardTitle>
+                  <CardTitle>Current Month&apos;s Goals</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -277,7 +277,7 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
                 <Textarea
                   value={reflection}
                   onChange={(e) => setReflection(e.target.value)}
-                  placeholder="What went well this month? What didn't go well? What would you like to improve?"
+                  placeholder="What went well this month? What didn&apos;t go well? What would you like to improve?"
                   className="min-h-[100px]"
                 />
               </CardContent>

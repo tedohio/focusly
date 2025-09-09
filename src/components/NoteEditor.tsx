@@ -130,7 +130,7 @@ export default function NoteEditor({ forDate, onComplete, timezone = 'UTC' }: No
       {content.trim() && (
         <div className="p-3 bg-green-50 rounded-lg">
           <p className="text-sm text-green-700">
-            ✓ Note will be automatically saved when you click "Save Note"
+            ✓ Note will be automatically saved when you click &quot;Save Note&quot;
           </p>
         </div>
       )}

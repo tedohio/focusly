@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -22,7 +22,7 @@ interface Todo {
   done: boolean;
   order: number;
   forDate: string;
-  dueDate?: string;
+  dueDate?: string | null;
 }
 
 interface TomorrowPlannerProps {
@@ -148,7 +148,7 @@ function SortableTomorrowTodoItem({ todo, onUpdate, onDelete, onDuplicate }: {
 export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete, timezone = 'UTC' }: TomorrowPlannerProps) {
   const [movedTodos, setMovedTodos] = useState<Set<string>>(new Set());
   const [newTodoTitle, setNewTodoTitle] = useState('');
-  const [isAdding, setIsAdding] = useState(false);
+  // const [isAdding, setIsAdding] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
@@ -181,7 +181,6 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
         optimisticTodo
       ]);
       setNewTodoTitle('');
-      setIsAdding(false);
       return { previousTodos, optimisticTodo };
     },
     onSuccess: (newTodo, variables, context) => {
@@ -196,7 +195,6 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
         queryClient.setQueryData(['todos', tomorrow], context.previousTodos);
       }
       setNewTodoTitle(variables.title);
-      setIsAdding(true);
       toast.error('Failed to create To-Do');
       console.error(err);
     },
@@ -328,9 +326,9 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
     duplicateMutation.mutate(id);
   };
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = tomorrowTodos.findIndex((todo) => todo.id === active.id);
       const newIndex = tomorrowTodos.findIndex((todo) => todo.id === over.id);
       const newTodos = arrayMove(tomorrowTodos, oldIndex, newIndex);
@@ -381,7 +379,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
       {/* Tomorrow's To-Dos Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Tomorrow's To-Dos</CardTitle>
+          <CardTitle className="text-lg">Tomorrow&apos;s To-Dos</CardTitle>
           <CardDescription>
             Plan and organize your tasks for tomorrow
           </CardDescription>
@@ -449,7 +447,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
           <CardHeader>
             <CardTitle className="text-lg">Incomplete Tasks from Today</CardTitle>
             <CardDescription>
-              Move these tasks to tomorrow's list
+              Move these tasks to tomorrow&apos;s list
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -472,7 +470,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete,
           <CardHeader>
             <CardTitle className="text-lg text-green-700">✓ Tasks Moved to Tomorrow</CardTitle>
             <CardDescription>
-              These tasks have been added to tomorrow's to-do list
+              These tasks have been added to tomorrow&apos;s to-do list
             </CardDescription>
           </CardHeader>
           <CardContent>

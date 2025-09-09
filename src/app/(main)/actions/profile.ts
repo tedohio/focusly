@@ -3,7 +3,7 @@
 import { db } from '@/db/drizzle';
 import { profiles } from '@/db/schema';
 import { requireAuth } from '@/lib/auth';
-import { profileSchema } from '@/lib/validators';
+// import { profileSchema } from '@/lib/validators';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
@@ -27,7 +27,7 @@ export async function updateProfile(data: Partial<{
   const user = await requireAuth();
   
   // Only validate and include fields that are actually provided
-  const updateData: any = {
+  const updateData: Partial<typeof profiles.$inferInsert> = {
     updatedAt: new Date(),
   };
 

@@ -115,7 +115,7 @@ export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }
         {/* What didn't go well - Red theme */}
         <div className="p-4 bg-red-50 rounded-lg border border-red-200">
           <label className="block text-sm font-medium text-red-800 mb-2">
-            🤔 What didn't go well?
+            🤔 What didn&apos;t go well?
           </label>
           <Textarea
             value={whatDidntGoWell}
@@ -178,7 +178,7 @@ export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }
       {hasContent && (
         <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
           <p className="text-sm text-green-700 font-medium">
-            ✨ Your reflection is ready to save! Click "Save Reflection" to store your thoughts.
+            ✨ Your reflection is ready to save! Click &quot;Save Reflection&quot; to store your thoughts.
           </p>
         </div>
       )}

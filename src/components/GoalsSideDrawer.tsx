@@ -108,7 +108,7 @@ export default function GoalsSideDrawer({ children }: GoalsSideDrawerProps) {
             {activeMonthlyGoals.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">This Month's Goals</CardTitle>
+                  <CardTitle className="text-lg">This Month&apos;s Goals</CardTitle>
                   <CardDescription>
                     {new Date(currentYear, currentMonth - 1).toLocaleDateString('en-US', { 
                       month: 'long', 
