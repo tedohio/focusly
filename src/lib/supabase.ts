@@ -4,9 +4,14 @@ import { createBrowserClient, createServerClient } from '@supabase/ssr';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Client-side Supabase client
+// Client-side Supabase client - use singleton pattern to prevent multiple instances
+let clientInstance: ReturnType<typeof createBrowserClient> | null = null;
+
 export const createClientComponentClient = () => {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  if (!clientInstance) {
+    clientInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+  return clientInstance;
 };
 
 // Server-side Supabase client
