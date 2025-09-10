@@ -19,6 +19,7 @@ interface Todo {
   done: boolean;
   order: number;
   forDate: string;
+  dueDate: string | null;
 }
 
 interface TomorrowPlannerProps {

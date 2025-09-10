@@ -21,7 +21,7 @@ interface Todo {
   done: boolean;
   order: number;
   forDate: string;
-  dueDate?: string;
+  dueDate: string | null;
 }
 
 interface TodoListProps {
