@@ -243,7 +243,7 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
           <DialogHeader>
             <DialogTitle>Monthly Review</DialogTitle>
             <DialogDescription>
-              It's time to reflect on this month and plan for next month. Here are your current goals and priorities.
+              It&apos;s time to reflect on this month and plan for next month. Here are your current goals and priorities.
             </DialogDescription>
           </DialogHeader>
           
@@ -252,7 +252,7 @@ export default function MonthlyReviewDialog({ }: MonthlyReviewDialogProps) {
             {currentMonthGoals.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Current Month's Goals</CardTitle>
+                  <CardTitle>Current Month&apos;s Goals</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">

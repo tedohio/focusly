@@ -223,9 +223,9 @@ export default function OnboardingPage() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Let's talk about you</CardTitle>
+              <CardTitle>Let&apos;s talk about you</CardTitle>
               <CardDescription>
-                What's your long-term goal? Be specific about what you want to achieve.
+                What&apos;s your long-term goal? Be specific about what you want to achieve.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -354,7 +354,7 @@ export default function OnboardingPage() {
             <CardHeader>
               <CardTitle>Welcome to Focusly!</CardTitle>
               <CardDescription>
-                You're all set up. Here's your daily loop:
+                You&apos;re all set up. Here&apos;s your daily loop:
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -370,20 +370,20 @@ export default function OnboardingPage() {
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">2</div>
                   <div>
                     <h3 className="font-medium">Reflect</h3>
-                    <p className="text-sm text-gray-600">What went well? What didn't? How can you improve?</p>
+                    <p className="text-sm text-gray-600">What went well? What didn&apos;t? How can you improve?</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">3</div>
                   <div>
-                    <h3 className="font-medium">Create Tomorrow's To-Dos</h3>
+                    <h3 className="font-medium">Create Tomorrow&apos;s To-Dos</h3>
                     <p className="text-sm text-gray-600">Plan your next day by moving incomplete tasks</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">4</div>
                   <div>
-                    <h3 className="font-medium">Today's To-Dos</h3>
+                    <h3 className="font-medium">Today&apos;s To-Dos</h3>
                     <p className="text-sm text-gray-600">Execute on your priorities with drag-to-reorder</p>
                   </div>
                 </div>
@@ -408,7 +408,7 @@ export default function OnboardingPage() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Welcome to Focusly</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Let's set up your goals and focus areas
+            Let&apos;s set up your goals and focus areas
           </p>
         </div>
 

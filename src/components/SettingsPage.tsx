@@ -51,7 +51,7 @@ export default function SettingsPage({ user }: SettingsPageProps) {
       await supabase.auth.signOut();
       router.push('/login');
       toast.success('Signed out successfully');
-    } catch (error) {
+    } catch {
       toast.error('Error signing out');
     }
   };
@@ -63,7 +63,7 @@ export default function SettingsPage({ user }: SettingsPageProps) {
       // This would involve deleting all user data and the auth account
       toast.error('Account deletion not implemented in this demo');
       setShowDeleteConfirm(false);
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete account');
     } finally {
       setIsDeleting(false);

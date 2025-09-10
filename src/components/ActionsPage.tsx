@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { CheckSquare, FileText, Target, Calendar } from 'lucide-react';
-import { getNote, createNote } from '@/app/(main)/actions/notes';
-import { getReflection, createReflection } from '@/app/(main)/actions/reflections';
+import { getNote } from '@/app/(main)/actions/notes';
+import { getReflection } from '@/app/(main)/actions/reflections';
 import { getTodos } from '@/app/(main)/actions/todos';
 import { getToday, getTomorrow } from '@/lib/date';
-import { toast } from 'sonner';
 import NoteEditor from './NoteEditor';
 import ReflectionForm from './ReflectionForm';
 import TodoList from './TodoList';
@@ -18,7 +16,6 @@ import TomorrowPlanner from './TomorrowPlanner';
 
 export default function ActionsPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const queryClient = useQueryClient();
   const today = getToday();
   const tomorrow = getTomorrow();
 
@@ -140,7 +137,7 @@ export default function ActionsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Daily Actions</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Your daily loop: Take Notes → Reflect → Create Tomorrow's To-Dos → Today's To-Dos
+          Your daily loop: Take Notes → Reflect → Create Tomorrow&apos;s To-Dos → Today&apos;s To-Dos
         </p>
       </div>
 

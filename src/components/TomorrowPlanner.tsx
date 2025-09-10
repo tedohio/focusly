@@ -141,7 +141,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete 
             <CardHeader>
               <CardTitle className="text-lg">Incomplete Tasks from Today</CardTitle>
               <CardDescription>
-                Drag or click "Move" to add these tasks to tomorrow's list
+                Drag or click &quot;Move&quot; to add these tasks to tomorrow&apos;s list
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -170,7 +170,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete 
               <CardHeader>
                 <CardTitle className="text-lg text-green-700">✓ Tasks Moved to Tomorrow</CardTitle>
                 <CardDescription>
-                  These tasks have been added to tomorrow's to-do list
+                  These tasks have been added to tomorrow&apos;s to-do list
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -207,7 +207,7 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete 
       {tomorrowTodos.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Tomorrow's To-Dos</CardTitle>
+            <CardTitle className="text-lg">Tomorrow&apos;s To-Dos</CardTitle>
             <CardDescription>
               Tasks already planned for tomorrow
             </CardDescription>

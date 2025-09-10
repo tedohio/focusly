@@ -32,7 +32,7 @@ export default function TopNav({ user }: TopNavProps) {
       await supabase.auth.signOut();
       router.push('/login');
       toast.success('Signed out successfully');
-    } catch (error) {
+    } catch {
       toast.error('Error signing out');
     } finally {
       setIsLoading(false);

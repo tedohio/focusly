@@ -89,7 +89,7 @@ export default function GoalsPage() {
   });
 
   const updateLongTermGoalMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => updateLongTermGoal(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) => updateLongTermGoal(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['longTermGoals'] });
       setEditingLongTerm(false);
@@ -475,7 +475,7 @@ export default function GoalsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>This Month's Goals</CardTitle>
+              <CardTitle>This Month&apos;s Goals</CardTitle>
               <CardDescription>
                 {new Date(currentYear, currentMonth - 1).toLocaleDateString('en-US', { 
                   month: 'long', 

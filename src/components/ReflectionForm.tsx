@@ -107,7 +107,7 @@ export default function ReflectionForm({ forDate, onComplete }: ReflectionFormPr
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            What didn't go well?
+            What didn&apos;t go well?
           </label>
           <Textarea
             value={whatDidntGoWell}
@@ -169,7 +169,7 @@ export default function ReflectionForm({ forDate, onComplete }: ReflectionFormPr
       {hasContent && (
         <div className="p-3 bg-green-50 rounded-lg">
           <p className="text-sm text-green-700">
-            ✓ Reflection will be saved when you click "Save Reflection"
+            ✓ Reflection will be saved when you click &quot;Save Reflection&quot;
           </p>
         </div>
       )}
