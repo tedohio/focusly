@@ -3,17 +3,17 @@ export function formatDate(date: Date | string): string {
   return d.toISOString().split('T')[0];
 }
 
-export function getToday(): string {
+export function getToday(timezone: string = 'UTC'): string {
   return formatDate(new Date());
 }
 
-export function getTomorrow(): string {
+export function getTomorrow(timezone: string = 'UTC'): string {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   return formatDate(tomorrow);
 }
 
-export function getYesterday(): string {
+export function getYesterday(timezone: string = 'UTC'): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   return formatDate(yesterday);
