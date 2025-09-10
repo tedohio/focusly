@@ -3,53 +3,20 @@ export function formatDate(date: Date | string): string {
   return d.toISOString().split('T')[0];
 }
 
-// Timezone mapping for common abbreviations
-const TIMEZONE_MAP: Record<string, string> = {
-  'PST': 'America/Los_Angeles',
-  'PDT': 'America/Los_Angeles',
-  'EST': 'America/New_York',
-  'EDT': 'America/New_York',
-  'CST': 'America/Chicago',
-  'CDT': 'America/Chicago',
-  'MST': 'America/Denver',
-  'MDT': 'America/Denver',
-  'UTC': 'UTC',
-  'GMT': 'UTC',
-};
-
-export function normalizeTimezone(timezone: string): string {
-  return TIMEZONE_MAP[timezone.toUpperCase()] || timezone;
+export function getToday(): string {
+  return formatDate(new Date());
 }
 
-export function formatDateInTimezone(date: Date | string, timezone: string = 'UTC'): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const normalizedTimezone = normalizeTimezone(timezone);
-  
-  // Use Intl.DateTimeFormat to format the date in the specified timezone
-  const formatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: normalizedTimezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  
-  return formatter.format(d);
-}
-
-export function getToday(timezone: string = 'UTC'): string {
-  return formatDateInTimezone(new Date(), timezone);
-}
-
-export function getTomorrow(timezone: string = 'UTC'): string {
+export function getTomorrow(): string {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  return formatDateInTimezone(tomorrow, timezone);
+  return formatDate(tomorrow);
 }
 
-export function getYesterday(timezone: string = 'UTC'): string {
+export function getYesterday(): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  return formatDateInTimezone(yesterday, timezone);
+  return formatDate(yesterday);
 }
 
 export function isEndOfMonth(date: Date | string = new Date()): boolean {

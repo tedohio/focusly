@@ -58,7 +58,7 @@ export async function createTodo(data: {
 export async function updateTodo(id: string, data: Partial<{
   title: string;
   done: boolean;
-  dueDate: string | null;
+  dueDate: string;
 }>) {
   const user = await requireAuth();
   

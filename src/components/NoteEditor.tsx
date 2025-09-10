@@ -11,10 +11,9 @@ import { toast } from 'sonner';
 interface NoteEditorProps {
   forDate: string;
   onComplete?: () => void;
-  timezone?: string;
 }
 
-export default function NoteEditor({ forDate, onComplete, timezone = 'UTC' }: NoteEditorProps) {
+export default function NoteEditor({ forDate, onComplete }: NoteEditorProps) {
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
@@ -30,7 +29,6 @@ export default function NoteEditor({ forDate, onComplete, timezone = 'UTC' }: No
       queryClient.invalidateQueries({ queryKey: ['note', forDate] });
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       setIsSaving(false);
-      setContent(''); // Clear the form after saving
       toast.success('Note saved');
       onComplete?.();
     },
@@ -78,12 +76,11 @@ export default function NoteEditor({ forDate, onComplete, timezone = 'UTC' }: No
       <div className="flex items-center space-x-2 text-sm text-gray-600">
         <FileText className="h-4 w-4" />
         <span>
-          {new Date(forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+          {new Date(forDate).toLocaleDateString('en-US', { 
             weekday: 'long',
             month: 'long', 
             day: 'numeric',
-            year: 'numeric',
-            timeZone: timezone
+            year: 'numeric'
           })}
         </span>
       </div>
@@ -130,7 +127,7 @@ export default function NoteEditor({ forDate, onComplete, timezone = 'UTC' }: No
       {content.trim() && (
         <div className="p-3 bg-green-50 rounded-lg">
           <p className="text-sm text-green-700">
-            ✓ Note will be automatically saved when you click &quot;Save Note&quot;
+            ✓ Note will be automatically saved when you click "Save Note"
           </p>
         </div>
       )}

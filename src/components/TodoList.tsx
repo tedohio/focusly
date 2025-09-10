@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -21,7 +21,7 @@ interface Todo {
   done: boolean;
   order: number;
   forDate: string;
-  dueDate?: string | null;
+  dueDate?: string;
 }
 
 interface TodoListProps {
@@ -112,129 +112,41 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
   const { data: todos = [], isLoading } = useQuery({
     queryKey: ['todos', forDate],
     queryFn: () => getTodos(forDate),
-    // Add staleTime to ensure fresh data when date changes
-    staleTime: 0,
   });
 
   const createMutation = useMutation({
     mutationFn: createTodo,
-    onMutate: async (newTodo) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['todos', forDate] });
-
-      // Snapshot the previous value
-      const previousTodos = queryClient.getQueryData(['todos', forDate]);
-
-      // Create optimistic todo
-      const optimisticTodo: Todo = {
-        id: `temp-${Date.now()}`, // Temporary ID
-        title: newTodo.title,
-        done: false,
-        order: (previousTodos as Todo[] || []).length * 100,
-        forDate: newTodo.forDate,
-        dueDate: newTodo.dueDate,
-      };
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['todos', forDate], (old: Todo[] = []) => [
-        ...old,
-        optimisticTodo
-      ]);
-
-      // Clear form immediately
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
       setNewTodoTitle('');
       setIsAdding(false);
-
-      // Return a context object with the snapshotted value
-      return { previousTodos, optimisticTodo };
     },
-    onSuccess: (newTodo, variables, context) => {
-      // Replace the optimistic todo with the real one from server
-      queryClient.setQueryData(['todos', forDate], (old: Todo[] = []) =>
-        old.map(todo => 
-          todo.id === context?.optimisticTodo.id ? newTodo : todo
-        )
-      );
-    },
-    onError: (err, variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos', forDate], context.previousTodos);
-      }
-      // Reset form state
-      setNewTodoTitle(variables.title);
-      setIsAdding(true);
-      toast.error('Failed to create To-Do');
-      console.error(err);
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure server state
-      queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
+    onError: (error) => {
+      toast.error('Failed to create todo');
+      console.error(error);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Todo> }) => updateTodo(id, data),
-    onMutate: async ({ id, data }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['todos', forDate] });
-
-      // Snapshot the previous value
-      const previousTodos = queryClient.getQueryData(['todos', forDate]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['todos', forDate], (old: Todo[] = []) =>
-        old.map(todo => todo.id === id ? { ...todo, ...data } : todo)
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousTodos };
-    },
-    onError: (err, variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos', forDate], context.previousTodos);
-      }
-      toast.error('Failed to update To-Do');
-      console.error(err);
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure server state
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
+    },
+    onError: (error) => {
+      toast.error('Failed to update todo');
+      console.error(error);
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteTodo,
-    onMutate: async (id) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['todos', forDate] });
-
-      // Snapshot the previous value
-      const previousTodos = queryClient.getQueryData(['todos', forDate]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['todos', forDate], (old: Todo[] = []) =>
-        old.filter(todo => todo.id !== id)
-      );
-
-      // Return a context object with the snapshotted value
-      return { previousTodos };
-    },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
       setDeleteConfirmId(null);
     },
-    onError: (err, id, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos', forDate], context.previousTodos);
-      }
-      toast.error('Failed to delete To-Do');
-      console.error(err);
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure server state
-      queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
+    onError: (error) => {
+      toast.error('Failed to delete todo');
+      console.error(error);
     },
   });
 
@@ -242,59 +154,38 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
     mutationFn: duplicateTodoToTomorrow,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos', getTomorrow()] });
-      toast.success('To-Do duplicated to tomorrow');
+      toast.success('Todo duplicated to tomorrow');
     },
     onError: (error) => {
-      toast.error('Failed to duplicate To-Do');
+      toast.error('Failed to duplicate todo');
       console.error(error);
     },
   });
 
   const reorderMutation = useMutation({
     mutationFn: reorderTodos,
-    onMutate: async (todoIds) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['todos', forDate] });
-
-      // Snapshot the previous value
-      const previousTodos = queryClient.getQueryData(['todos', forDate]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['todos', forDate], (old: Todo[] = []) => {
-        const todoMap = new Map(old.map(todo => [todo.id, todo]));
-        return todoIds.map(id => todoMap.get(id)).filter(Boolean) as Todo[];
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousTodos };
-    },
-    onError: (err, todoIds, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos', forDate], context.previousTodos);
-      }
-      toast.error('Failed to reorder To-Dos');
-      console.error(err);
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure server state
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos', forDate] });
+    },
+    onError: (error) => {
+      toast.error('Failed to reorder todos');
+      console.error(error);
     },
   });
 
-  const handleAddTodo = () => {
+  const handleAddTodo = async () => {
     if (!newTodoTitle.trim()) return;
     
-    createMutation.mutate({
+    await createMutation.mutateAsync({
       title: newTodoTitle.trim(),
       forDate,
     });
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (active.id !== over.id) {
       const oldIndex = todos.findIndex((todo) => todo.id === active.id);
       const newIndex = todos.findIndex((todo) => todo.id === over.id);
       
@@ -305,12 +196,12 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
     }
   };
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
+  const handleDelete = async (id: string) => {
+    await deleteMutation.mutateAsync(id);
   };
 
-  const handleDuplicate = (id: string) => {
-    duplicateMutation.mutate(id);
+  const handleDuplicate = async (id: string) => {
+    await duplicateMutation.mutateAsync(id);
   };
 
   if (isLoading) {
@@ -352,7 +243,7 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
               <Input
                 value={newTodoTitle}
                 onChange={(e) => setNewTodoTitle(e.target.value)}
-                placeholder="Enter new To-Do..."
+                placeholder="Enter new todo..."
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleAddTodo();
@@ -388,7 +279,7 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add To-Do
+              Add Todo
             </Button>
           )}
         </div>
@@ -398,8 +289,8 @@ export default function TodoList({ forDate, showAddButton = true }: TodoListProp
         open={!!deleteConfirmId}
         onOpenChange={(open) => !open && setDeleteConfirmId(null)}
         onConfirm={() => deleteConfirmId && handleDelete(deleteConfirmId)}
-        title="Delete To-Do"
-        description="Are you sure you want to delete this To-Do? This action cannot be undone."
+        title="Delete Todo"
+        description="Are you sure you want to delete this todo? This action cannot be undone."
         confirmText="Delete"
         confirmVariant="destructive"
       />

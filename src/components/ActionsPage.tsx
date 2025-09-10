@@ -1,27 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Target, Calendar } from 'lucide-react';
-import { getNote } from '@/app/(main)/actions/notes';
-import { getReflection } from '@/app/(main)/actions/reflections';
+import { Textarea } from '@/components/ui/textarea';
+import { CheckSquare, FileText, Target, Calendar } from 'lucide-react';
+import { getNote, createNote } from '@/app/(main)/actions/notes';
+import { getReflection, createReflection } from '@/app/(main)/actions/reflections';
 import { getTodos } from '@/app/(main)/actions/todos';
 import { getToday, getTomorrow } from '@/lib/date';
+import { toast } from 'sonner';
 import NoteEditor from './NoteEditor';
 import ReflectionForm from './ReflectionForm';
+import TodoList from './TodoList';
 import TomorrowPlanner from './TomorrowPlanner';
 
-interface ActionsPageProps {
-  timezone?: string;
-}
-
-export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
+export default function ActionsPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  // const queryClient = useQueryClient();
-  const today = getToday(timezone);
-  const tomorrow = getTomorrow(timezone);
+  const queryClient = useQueryClient();
+  const today = getToday();
+  const tomorrow = getTomorrow();
 
   const { data: todayNote } = useQuery({
     queryKey: ['note', today],
@@ -56,16 +55,23 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
     {
       id: 'reflect',
       title: 'Reflect',
-      description: 'What went well? What didn&apos;t? How can you improve?',
+      description: 'What went well? What didn\'t? How can you improve?',
       icon: Target,
       completed: !!(todayReflection?.whatWentWell || todayReflection?.whatDidntGoWell || todayReflection?.improvements),
     },
     {
       id: 'tomorrow',
-      title: 'Create Tomorrow&apos;s To-Dos',
+      title: 'Create Tomorrow\'s To-Dos',
       description: 'Plan your next day by moving incomplete tasks',
       icon: Calendar,
       completed: incompleteTodayTodos.length === 0 || tomorrowTodos.length > 0,
+    },
+    {
+      id: 'today',
+      title: 'Today\'s To-Dos',
+      description: 'Execute on your priorities with drag-to-reorder',
+      icon: CheckSquare,
+      completed: todayTodos.length > 0,
     },
   ];
 
@@ -95,14 +101,14 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
       case 'notes':
         return (
           <div className="space-y-4">
-            <NoteEditor forDate={today} onComplete={() => handleStepComplete('notes')} timezone={timezone} />
+            <NoteEditor forDate={today} onComplete={() => handleStepComplete('notes')} />
           </div>
         );
         
       case 'reflect':
         return (
           <div className="space-y-4">
-            <ReflectionForm forDate={today} onComplete={() => handleStepComplete('reflect')} timezone={timezone} />
+            <ReflectionForm forDate={today} onComplete={() => handleStepComplete('reflect')} />
           </div>
         );
         
@@ -113,8 +119,14 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
               todayTodos={incompleteTodayTodos}
               tomorrowTodos={tomorrowTodos}
               onComplete={() => handleStepComplete('tomorrow')}
-              timezone={timezone}
             />
+          </div>
+        );
+        
+      case 'today':
+        return (
+          <div className="space-y-4">
+            <TodoList forDate={today} showAddButton={true} />
           </div>
         );
         
@@ -128,7 +140,7 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Daily Actions</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Your daily loop: Take Notes → Reflect → Create Tomorrow&apos;s To-Dos
+          Your daily loop: Take Notes → Reflect → Create Tomorrow's To-Dos → Today's To-Dos
         </p>
       </div>
 
@@ -143,27 +155,23 @@ export default function ActionsPage({ timezone = 'UTC' }: ActionsPageProps) {
           return (
             <div key={step.id} className="flex items-center">
               <div className="flex flex-col items-center">
-                <button
-                  onClick={() => setCurrentStep(index)}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                     isActive
                       ? 'border-blue-600 bg-blue-600 text-white'
                       : isCompleted || isPast
-                      ? 'border-green-600 bg-green-600 text-white hover:bg-green-700'
-                      : 'border-gray-300 bg-white text-gray-400 hover:border-gray-400 hover:text-gray-500'
+                      ? 'border-green-600 bg-green-600 text-white'
+                      : 'border-gray-300 bg-white text-gray-400'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
-                </button>
+                </div>
                 <div className="mt-2 text-center">
-                  <button
-                    onClick={() => setCurrentStep(index)}
-                    className={`text-xs font-medium transition-colors ${
-                      isActive ? 'text-blue-600' : isCompleted || isPast ? 'text-green-600 hover:text-green-700' : 'text-gray-400 hover:text-gray-500'
-                    }`}
-                  >
+                  <p className={`text-xs font-medium ${
+                    isActive ? 'text-blue-600' : isCompleted || isPast ? 'text-green-600' : 'text-gray-400'
+                  }`}>
                     {step.title}
-                  </button>
+                  </p>
                 </div>
               </div>
               {index < steps.length - 1 && (

@@ -12,11 +12,7 @@ import { getNotes } from '@/app/(main)/actions/notes';
 import { getTodos } from '@/app/(main)/actions/all-todos';
 import { getLongTermGoals, getFocusAreas, getMonthlyGoals } from '@/app/(main)/actions/goals';
 
-interface HistoryPageProps {
-  timezone?: string;
-}
-
-export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
+export default function HistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentTab, setCurrentTab] = useState('reflections');
   const itemsPerPage = 10;
@@ -115,10 +111,9 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                       <div key={reflection.id} className="p-4 bg-blue-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-blue-900">
-                            {new Date(reflection.forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+                            {new Date(reflection.forDate).toLocaleDateString('en-US', { 
                               month: 'long', 
-                              year: 'numeric',
-                              timeZone: timezone
+                              year: 'numeric' 
                             })}
                           </h3>
                           <Badge variant="secondary">Monthly</Badge>
@@ -130,7 +125,7 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                         )}
                         {reflection.whatDidntGoWell && (
                           <div className="text-sm text-blue-700 mt-1">
-                            <strong>What didn&apos;t go well:</strong> {reflection.whatDidntGoWell}
+                            <strong>What didn't go well:</strong> {reflection.whatDidntGoWell}
                           </div>
                         )}
                         {reflection.improvements && (
@@ -160,12 +155,11 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                       <div key={reflection.id} className="p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">
-                            {new Date(reflection.forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+                            {new Date(reflection.forDate).toLocaleDateString('en-US', { 
                               weekday: 'long',
                               month: 'short', 
                               day: 'numeric',
-                              year: 'numeric',
-                              timeZone: timezone
+                              year: 'numeric'
                             })}
                           </h3>
                         </div>
@@ -176,7 +170,7 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                         )}
                         {reflection.whatDidntGoWell && (
                           <div className="text-sm text-gray-700 mt-1">
-                            <strong>What didn&apos;t go well:</strong> {reflection.whatDidntGoWell}
+                            <strong>What didn't go well:</strong> {reflection.whatDidntGoWell}
                           </div>
                         )}
                         {reflection.improvements && (
@@ -327,7 +321,7 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
               {todos.length > 0 ? (
                 <div className="space-y-4">
                   {todos
-                    .sort((a, b) => new Date(b.forDate + 'T00:00:00').getTime() - new Date(a.forDate + 'T00:00:00').getTime())
+                    .sort((a, b) => new Date(b.forDate).getTime() - new Date(a.forDate).getTime())
                     .map((todo) => (
                       <div key={todo.id} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center justify-between">
@@ -338,10 +332,9 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                             </span>
                           </div>
                           <span className="text-xs text-gray-500">
-                            {new Date(todo.forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+                            {new Date(todo.forDate).toLocaleDateString('en-US', { 
                               month: 'short', 
-                              day: 'numeric',
-                              timeZone: timezone
+                              day: 'numeric' 
                             })}
                           </span>
                         </div>
@@ -370,12 +363,11 @@ export default function HistoryPage({ timezone = 'UTC' }: HistoryPageProps) {
                     <div key={note.id} className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium text-gray-900">
-                          {new Date(note.forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+                          {new Date(note.forDate).toLocaleDateString('en-US', { 
                             weekday: 'long',
                             month: 'short', 
                             day: 'numeric',
-                            year: 'numeric',
-                            timeZone: timezone
+                            year: 'numeric'
                           })}
                         </h3>
                       </div>

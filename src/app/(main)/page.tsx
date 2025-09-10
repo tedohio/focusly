@@ -1,4 +1,4 @@
-import { getUser, getProfile } from '@/lib/auth';
+import { getUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import TodoList from '@/components/TodoList';
 import GoalsSideDrawer from '@/components/GoalsSideDrawer';
@@ -13,22 +13,19 @@ export default async function TodayPage() {
     redirect('/login');
   }
 
-  const profile = await getProfile(user.id);
-  const timezone = profile?.timezone || 'UTC';
-  const today = getToday(timezone);
+  const today = getToday();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Today&apos;s To-Dos</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Today's To-Dos</h1>
           <p className="text-sm text-gray-600 mt-1">
             {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
               month: 'long', 
-              day: 'numeric',
-              timeZone: timezone
+              day: 'numeric' 
             })}
           </p>
         </div>

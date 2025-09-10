@@ -4,28 +4,23 @@ import { createBrowserClient, createServerClient } from '@supabase/ssr';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Client-side Supabase client - use singleton pattern to prevent multiple instances
-let clientInstance: ReturnType<typeof createBrowserClient> | null = null;
-
+// Client-side Supabase client
 export const createClientComponentClient = () => {
-  if (!clientInstance) {
-    clientInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
-  }
-  return clientInstance;
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 };
 
 // Server-side Supabase client
 export const createServerComponentClient = () => {
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(_name: string) {
+      get(name: string) {
         // This will be handled by the middleware
         return undefined;
       },
-      set(_name: string, _value: string, _options: { [key: string]: unknown }) {
+      set(name: string, value: string, options: { [key: string]: any }) {
         // This will be handled by the middleware
       },
-      remove(_name: string, _options: { [key: string]: unknown }) {
+      remove(name: string, options: { [key: string]: any }) {
         // This will be handled by the middleware
       },
     },

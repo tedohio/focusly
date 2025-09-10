@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-// import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -11,32 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GripVertical, Plus, Trash2, ArrowRight, ArrowLeft, Globe } from 'lucide-react';
+import { GripVertical, Plus, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { createLongTermGoal, createFocusAreas, createMonthlyGoals } from '@/app/(main)/actions/goals';
 import { completeOnboarding } from '@/app/(main)/actions/profile';
 import { getCurrentMonth, getCurrentYear } from '@/lib/date';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
-
-// Common timezone options
-const TIMEZONE_OPTIONS = [
-  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'America/Anchorage', label: 'Alaska Time (AT)' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii Time (HT)' },
-  { value: 'Europe/London', label: 'Greenwich Mean Time (GMT)' },
-  { value: 'Europe/Paris', label: 'Central European Time (CET)' },
-  { value: 'Europe/Berlin', label: 'Central European Time (CET)' },
-  { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST)' },
-  { value: 'Asia/Shanghai', label: 'China Standard Time (CST)' },
-  { value: 'Asia/Kolkata', label: 'India Standard Time (IST)' },
-  { value: 'Australia/Sydney', label: 'Australian Eastern Time (AET)' },
-  { value: 'Australia/Melbourne', label: 'Australian Eastern Time (AET)' },
-];
 
 interface FocusArea {
   id: string;
@@ -55,95 +35,26 @@ const STEPS = [
   'long-term-goal',
   'focus-areas',
   'monthly-goals',
-  'timezone',
   'complete'
 ] as const;
-
-const STEP_TITLES = {
-  'long-term-goal': 'Long-term Goal',
-  'focus-areas': 'Focus Areas',
-  'monthly-goals': 'Monthly Goals',
-  'timezone': 'Timezone',
-  'complete': 'Complete'
-} as const;
 
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [longTermGoal, setLongTermGoal] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('onboarding-long-term-goal');
-      return saved ? JSON.parse(saved) : { title: '', description: '', targetYears: 3 };
-    }
-    return { title: '', description: '', targetYears: 3 };
-  });
-  const [focusAreas, setFocusAreas] = useState<FocusArea[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('onboarding-focus-areas');
-      return saved ? JSON.parse(saved) : [
-        { id: '1', title: '', description: '', order: 1 },
-        { id: '2', title: '', description: '', order: 2 },
-        { id: '3', title: '', description: '', order: 3 },
-      ];
-    }
-    return [
-      { id: '1', title: '', description: '', order: 1 },
-      { id: '2', title: '', description: '', order: 2 },
-      { id: '3', title: '', description: '', order: 3 },
-    ];
-  });
-  const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoal[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('onboarding-monthly-goals');
-      return saved ? JSON.parse(saved) : [
-        { id: '1', title: '', order: 1 },
-        { id: '2', title: '', order: 2 },
-        { id: '3', title: '', order: 3 },
-      ];
-    }
-    return [
-      { id: '1', title: '', order: 1 },
-      { id: '2', title: '', order: 2 },
-      { id: '3', title: '', order: 3 },
-    ];
-  });
-  const [timezone, setTimezone] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('onboarding-timezone');
-      return saved || 'America/Los_Angeles'; // Default to PST
-    }
-    return 'America/Los_Angeles';
-  });
+  const [longTermGoal, setLongTermGoal] = useState({ title: '', description: '', targetYears: 3 });
+  const [focusAreas, setFocusAreas] = useState<FocusArea[]>([
+    { id: '1', title: '', description: '', order: 1 },
+    { id: '2', title: '', description: '', order: 2 },
+    { id: '3', title: '', description: '', order: 3 },
+  ]);
+  const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoal[]>([
+    { id: '1', title: '', order: 1 },
+    { id: '2', title: '', order: 2 },
+    { id: '3', title: '', order: 3 },
+  ]);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  // const router = useRouter();
-
-  // Save form data to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('onboarding-long-term-goal', JSON.stringify(longTermGoal));
-  }, [longTermGoal]);
-
-  useEffect(() => {
-    localStorage.setItem('onboarding-focus-areas', JSON.stringify(focusAreas));
-  }, [focusAreas]);
-
-  useEffect(() => {
-    localStorage.setItem('onboarding-monthly-goals', JSON.stringify(monthlyGoals));
-  }, [monthlyGoals]);
-
-  useEffect(() => {
-    localStorage.setItem('onboarding-timezone', timezone);
-  }, [timezone]);
-
-  // Clear localStorage when onboarding is completed
-  useEffect(() => {
-    if (currentStep === STEPS.length - 1) {
-      localStorage.removeItem('onboarding-long-term-goal');
-      localStorage.removeItem('onboarding-focus-areas');
-      localStorage.removeItem('onboarding-monthly-goals');
-      localStorage.removeItem('onboarding-timezone');
-    }
-  }, [currentStep]);
+  const router = useRouter();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -180,8 +91,7 @@ export default function OnboardingPage() {
     mutationFn: completeOnboarding,
     onSuccess: () => {
       toast.success('Onboarding completed! Welcome to Focusly!');
-      // Use window.location to force a full page reload and clear any cached data
-      window.location.href = '/';
+      router.push('/');
     },
     onError: (error) => {
       toast.error('Failed to complete onboarding');
@@ -229,16 +139,8 @@ export default function OnboardingPage() {
           );
           break;
           
-        case 'timezone':
-          if (!timezone) {
-            toast.error('Please select your timezone');
-            return;
-          }
-          // No API call needed here, timezone will be saved in complete step
-          break;
-          
         case 'complete':
-          await completeOnboardingMutation.mutateAsync({ timezone });
+          await completeOnboardingMutation.mutateAsync();
           return;
       }
       
@@ -297,18 +199,18 @@ export default function OnboardingPage() {
     setDeleteConfirmId(null);
   };
 
-  const handleFocusAreaDragEnd = (event: DragEndEvent) => {
+  const handleFocusAreaDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
+    if (active.id !== over.id) {
       const oldIndex = focusAreas.findIndex((fa) => fa.id === active.id);
       const newIndex = focusAreas.findIndex((fa) => fa.id === over.id);
       setFocusAreas(arrayMove(focusAreas, oldIndex, newIndex));
     }
   };
 
-  const handleMonthlyGoalDragEnd = (event: DragEndEvent) => {
+  const handleMonthlyGoalDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
+    if (active.id !== over.id) {
       const oldIndex = monthlyGoals.findIndex((mg) => mg.id === active.id);
       const newIndex = monthlyGoals.findIndex((mg) => mg.id === over.id);
       setMonthlyGoals(arrayMove(monthlyGoals, oldIndex, newIndex));
@@ -321,9 +223,9 @@ export default function OnboardingPage() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Let&apos;s talk about you</CardTitle>
+              <CardTitle>Let's talk about you</CardTitle>
               <CardDescription>
-                What&apos;s your long-term goal? Be specific about what you want to achieve.
+                What's your long-term goal? Be specific about what you want to achieve.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -446,50 +348,13 @@ export default function OnboardingPage() {
           </Card>
         );
 
-      case 'timezone':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Globe className="h-5 w-5" />
-                <span>Choose Your Timezone</span>
-              </CardTitle>
-              <CardDescription>
-                This ensures your daily todos, notes, and reflections reset at the right time for you.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select your timezone
-                </label>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIMEZONE_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500 mt-2">
-                  This affects when your daily todos, notes, and reflections reset each day.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
       case 'complete':
         return (
           <Card>
             <CardHeader>
               <CardTitle>Welcome to Focusly!</CardTitle>
               <CardDescription>
-                You&apos;re all set up. Here&apos;s your daily loop:
+                You're all set up. Here's your daily loop:
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -497,29 +362,29 @@ export default function OnboardingPage() {
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">1</div>
                   <div>
-                    <h3 className="font-medium">Today&apos;s To-Dos</h3>
-                    <p className="text-sm text-gray-600">Execute on your priorities with drag-to-reorder</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">2</div>
-                  <div>
                     <h3 className="font-medium">Take Notes</h3>
                     <p className="text-sm text-gray-600">Capture thoughts and ideas throughout the day</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">3</div>
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">2</div>
                   <div>
                     <h3 className="font-medium">Reflect</h3>
-                    <p className="text-sm text-gray-600">What went well? What didn&apos;t? How can you improve?</p>
+                    <p className="text-sm text-gray-600">What went well? What didn't? How can you improve?</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">3</div>
+                  <div>
+                    <h3 className="font-medium">Create Tomorrow's To-Dos</h3>
+                    <p className="text-sm text-gray-600">Plan your next day by moving incomplete tasks</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">4</div>
                   <div>
-                    <h3 className="font-medium">Create Tomorrow&apos;s To-Dos</h3>
-                    <p className="text-sm text-gray-600">Plan your next day by moving incomplete tasks</p>
+                    <h3 className="font-medium">Today's To-Dos</h3>
+                    <p className="text-sm text-gray-600">Execute on your priorities with drag-to-reorder</p>
                   </div>
                 </div>
               </div>
@@ -543,7 +408,7 @@ export default function OnboardingPage() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Welcome to Focusly</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Let&apos;s set up your goals and focus areas
+            Let's set up your goals and focus areas
           </p>
         </div>
 
@@ -559,13 +424,6 @@ export default function OnboardingPage() {
               />
             ))}
           </div>
-        </div>
-
-        {/* Step title */}
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {STEP_TITLES[STEPS[currentStep]]}
-          </h2>
         </div>
 
         {renderStep()}

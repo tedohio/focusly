@@ -9,31 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User, LogOut, Trash2, Settings as SettingsIcon } from 'lucide-react';
 import { getProfile, updateProfile } from '@/app/(main)/actions/profile';
-import { getLongTermGoals, getFocusAreas, getMonthlyGoals } from '@/app/(main)/actions/goals';
 import { toast } from 'sonner';
 import ConfirmDialog from './ConfirmDialog';
-
-// Common timezone options
-const TIMEZONE_OPTIONS = [
-  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'America/Anchorage', label: 'Alaska Time (AT)' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii Time (HT)' },
-  { value: 'Europe/London', label: 'Greenwich Mean Time (GMT)' },
-  { value: 'Europe/Paris', label: 'Central European Time (CET)' },
-  { value: 'Europe/Berlin', label: 'Central European Time (CET)' },
-  { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST)' },
-  { value: 'Asia/Shanghai', label: 'China Standard Time (CST)' },
-  { value: 'Asia/Kolkata', label: 'India Standard Time (IST)' },
-  { value: 'Australia/Sydney', label: 'Australian Eastern Time (AET)' },
-  { value: 'Australia/Melbourne', label: 'Australian Eastern Time (AET)' },
-];
 
 interface SettingsPageProps {
   user: {
@@ -55,30 +34,15 @@ export default function SettingsPage({ user }: SettingsPageProps) {
     queryFn: getProfile,
   });
 
-  const { data: longTermGoals } = useQuery({
-    queryKey: ['longTermGoals'],
-    queryFn: getLongTermGoals,
-  });
-
-  const { data: focusAreas } = useQuery({
-    queryKey: ['focusAreas'],
-    queryFn: getFocusAreas,
-  });
-
-  const { data: monthlyGoals } = useQuery({
-    queryKey: ['monthlyGoals'],
-    queryFn: getMonthlyGoals,
-  });
-
   const updateProfileMutation = useMutation({
     mutationFn: updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       toast.success('Profile updated');
     },
-    onError: (err) => {
+    onError: (error) => {
       toast.error('Failed to update profile');
-      console.error(err);
+      console.error(error);
     },
   });
 
@@ -87,7 +51,7 @@ export default function SettingsPage({ user }: SettingsPageProps) {
       await supabase.auth.signOut();
       router.push('/login');
       toast.success('Signed out successfully');
-    } catch {
+    } catch (error) {
       toast.error('Error signing out');
     }
   };
@@ -99,7 +63,7 @@ export default function SettingsPage({ user }: SettingsPageProps) {
       // This would involve deleting all user data and the auth account
       toast.error('Account deletion not implemented in this demo');
       setShowDeleteConfirm(false);
-    } catch {
+    } catch (error) {
       toast.error('Failed to delete account');
     } finally {
       setIsDeleting(false);
@@ -164,21 +128,13 @@ export default function SettingsPage({ user }: SettingsPageProps) {
           <div>
             <Label htmlFor="timezone">Timezone</Label>
             <div className="flex space-x-2 mt-1">
-              <Select
-                value={timezone || profile?.timezone || 'UTC'}
-                onValueChange={setTimezone}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select your timezone" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEZONE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="timezone"
+                value={timezone || profile?.timezone || ''}
+                onChange={(e) => setTimezone(e.target.value)}
+                placeholder="e.g., America/New_York, Europe/London"
+                className="flex-1"
+              />
               <Button
                 onClick={handleSaveTimezone}
                 disabled={updateProfileMutation.isPending}
@@ -190,90 +146,6 @@ export default function SettingsPage({ user }: SettingsPageProps) {
               Used for date-based features. Current: {profile?.timezone || 'UTC'}
             </p>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Onboarding Data */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <User className="h-5 w-5" />
-            <span>Your Goals & Focus Areas</span>
-          </CardTitle>
-          <CardDescription>
-            View and manage your long-term goals, focus areas, and monthly goals
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Long-term Goal */}
-          {longTermGoals && longTermGoals.length > 0 && (
-            <div>
-              <Label className="text-sm font-medium">Long-term Goal</Label>
-              <div className="mt-2 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium text-gray-900">{longTermGoals[0].title}</h3>
-                {longTermGoals[0].description && (
-                  <p className="text-sm text-gray-600 mt-1">{longTermGoals[0].description}</p>
-                )}
-                <p className="text-xs text-gray-500 mt-2">
-                  Target: {longTermGoals[0].targetYears} years
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Focus Areas */}
-          {focusAreas && focusAreas.length > 0 && (
-            <div>
-              <Label className="text-sm font-medium">Focus Areas</Label>
-              <div className="mt-2 space-y-3">
-                {focusAreas.map((area, index) => (
-                  <div key={area.id} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{area.title}</h4>
-                        {area.description && (
-                          <p className="text-sm text-gray-600 mt-1">{area.description}</p>
-                        )}
-                      </div>
-                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                        #{index + 1}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Monthly Goals */}
-          {monthlyGoals && monthlyGoals.length > 0 && (
-            <div>
-              <Label className="text-sm font-medium">Current Monthly Goals</Label>
-              <div className="mt-2 space-y-3">
-                {monthlyGoals.map((goal, index) => (
-                  <div key={goal.id} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{goal.title}</h4>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {goal.month}/{goal.year} • Status: {goal.status}
-                        </p>
-                      </div>
-                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                        #{index + 1}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {(!longTermGoals || longTermGoals.length === 0) && (!focusAreas || focusAreas.length === 0) && (!monthlyGoals || monthlyGoals.length === 0) && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No goals or focus areas found. Complete the onboarding to get started!</p>
-            </div>
-          )}
         </CardContent>
       </Card>
 

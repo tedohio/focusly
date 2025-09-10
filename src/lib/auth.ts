@@ -41,33 +41,35 @@ export async function requireAuth() {
 }
 
 export async function getProfile(userId: string) {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+  
   try {
-    // Import Drizzle here to avoid circular dependencies
-    const { db } = await import('@/db/drizzle');
-    const { profiles } = await import('@/db/schema');
-    const { eq } = await import('drizzle-orm');
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
     
-    const profile = await db
-      .select()
-      .from(profiles)
-      .where(eq(profiles.userId, userId))
-      .limit(1);
-
-    return profile[0] || null;
+    if (error) {
+      console.error('Error getting profile:', error);
+      return null;
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error getting profile:', error);
     return null;
-  }
-}
-
-export async function getUserTimezone(): Promise<string> {
-  try {
-    const user = await requireAuth();
-    const profile = await getProfile(user.id);
-    return profile?.timezone || 'UTC';
-  } catch (error) {
-    console.error('Error getting user timezone:', error);
-    return 'UTC';
   }
 }
 

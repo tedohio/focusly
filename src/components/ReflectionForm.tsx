@@ -11,10 +11,9 @@ import { toast } from 'sonner';
 interface ReflectionFormProps {
   forDate: string;
   onComplete?: () => void;
-  timezone?: string;
 }
 
-export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }: ReflectionFormProps) {
+export default function ReflectionForm({ forDate, onComplete }: ReflectionFormProps) {
   const [whatWentWell, setWhatWentWell] = useState('');
   const [whatDidntGoWell, setWhatDidntGoWell] = useState('');
   const [improvements, setImprovements] = useState('');
@@ -32,10 +31,6 @@ export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }
       queryClient.invalidateQueries({ queryKey: ['reflection', forDate] });
       queryClient.invalidateQueries({ queryKey: ['reflections'] });
       setIsSaving(false);
-      // Clear the form after saving
-      setWhatWentWell('');
-      setWhatDidntGoWell('');
-      setImprovements('');
       toast.success('Reflection saved');
       onComplete?.();
     },
@@ -88,53 +83,49 @@ export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }
       <div className="flex items-center space-x-2 text-sm text-gray-600">
         <Target className="h-4 w-4" />
         <span>
-          {new Date(forDate + 'T00:00:00').toLocaleDateString('en-US', { 
+          {new Date(forDate).toLocaleDateString('en-US', { 
             weekday: 'long',
             month: 'long', 
             day: 'numeric',
-            year: 'numeric',
-            timeZone: timezone
+            year: 'numeric'
           })}
         </span>
       </div>
 
-      <div className="space-y-6">
-        {/* What went well - Green theme */}
-        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-          <label className="block text-sm font-medium text-green-800 mb-2">
-            🌟 What went well today?
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            What went well today?
           </label>
           <Textarea
             value={whatWentWell}
             onChange={(e) => setWhatWentWell(e.target.value)}
             placeholder="What accomplishments, positive moments, or wins did you have today?"
-            className="min-h-[100px] resize-none border-green-300 focus:border-green-500 focus:ring-green-500"
+            className="min-h-[100px] resize-none"
           />
         </div>
 
-        {/* What didn't go well - Red theme */}
-        <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-          <label className="block text-sm font-medium text-red-800 mb-2">
-            🤔 What didn&apos;t go well?
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            What didn't go well?
           </label>
           <Textarea
             value={whatDidntGoWell}
             onChange={(e) => setWhatDidntGoWell(e.target.value)}
             placeholder="What challenges, setbacks, or areas of struggle did you face?"
-            className="min-h-[100px] resize-none border-red-300 focus:border-red-500 focus:ring-red-500"
+            className="min-h-[100px] resize-none"
           />
         </div>
 
-        {/* How to improve - Blue theme */}
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <label className="block text-sm font-medium text-blue-800 mb-2">
-            🚀 How can you improve?
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            How can you improve?
           </label>
           <Textarea
             value={improvements}
             onChange={(e) => setImprovements(e.target.value)}
             placeholder="What specific actions or changes will you make tomorrow or in the future?"
-            className="min-h-[100px] resize-none border-blue-300 focus:border-blue-500 focus:ring-blue-500"
+            className="min-h-[100px] resize-none"
           />
         </div>
       </div>
@@ -176,9 +167,9 @@ export default function ReflectionForm({ forDate, onComplete, timezone = 'UTC' }
       </div>
 
       {hasContent && (
-        <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-          <p className="text-sm text-green-700 font-medium">
-            ✨ Your reflection is ready to save! Click &quot;Save Reflection&quot; to store your thoughts.
+        <div className="p-3 bg-green-50 rounded-lg">
+          <p className="text-sm text-green-700">
+            ✓ Reflection will be saved when you click "Save Reflection"
           </p>
         </div>
       )}

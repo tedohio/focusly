@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
-        set(name: string, value: string, options: { [key: string]: unknown }) {
+        set(name: string, value: string, options: { [key: string]: any }) {
           request.cookies.set({
             name,
             value,
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
             ...options,
           });
         },
-        remove(name: string, options: { [key: string]: unknown }) {
+        remove(name: string, options: { [key: string]: any }) {
           request.cookies.set({
             name,
             value: '',
@@ -52,17 +52,13 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log('🛡️ Middleware - Path:', request.nextUrl.pathname, 'User:', user ? 'authenticated' : 'not authenticated');
-
   // If user is not signed in and the current path is not /login, redirect to /login
   if (!user && request.nextUrl.pathname !== '/login') {
-    console.log('🔄 Redirecting to login - no user');
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   // If user is signed in and the current path is /login, redirect to /
   if (user && request.nextUrl.pathname === '/login') {
-    console.log('🏠 Redirecting to home - user authenticated');
     return NextResponse.redirect(new URL('/', request.url));
   }
 
