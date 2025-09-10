@@ -30,7 +30,28 @@ export default function LoginPage() {
       } else {
         toast.success('Check your email for the login link!');
       }
-    } catch {
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (error) {
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -51,7 +72,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle>Sign in to your account</CardTitle>
             <CardDescription>
-              Enter your email to receive a magic link
+              Enter your email to receive a magic link, or sign in with Google
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -71,6 +92,27 @@ export default function LoginPage() {
                 {isLoading ? 'Sending...' : 'Send magic link'}
               </Button>
             </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Loading...' : 'Sign in with Google'}
+            </Button>
           </CardContent>
         </Card>
       </div>
