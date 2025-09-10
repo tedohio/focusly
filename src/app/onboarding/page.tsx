@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -199,18 +199,18 @@ export default function OnboardingPage() {
     setDeleteConfirmId(null);
   };
 
-  const handleFocusAreaDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleFocusAreaDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = focusAreas.findIndex((fa) => fa.id === active.id);
       const newIndex = focusAreas.findIndex((fa) => fa.id === over.id);
       setFocusAreas(arrayMove(focusAreas, oldIndex, newIndex));
     }
   };
 
-  const handleMonthlyGoalDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleMonthlyGoalDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = monthlyGoals.findIndex((mg) => mg.id === active.id);
       const newIndex = monthlyGoals.findIndex((mg) => mg.id === over.id);
       setMonthlyGoals(arrayMove(monthlyGoals, oldIndex, newIndex));
