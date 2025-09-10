@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -210,9 +210,9 @@ export default function GoalsPage() {
     await createMonthlyGoalsMutation.mutateAsync(goalsWithOrder);
   };
 
-  const handleMonthlyGoalDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleMonthlyGoalDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = monthlyGoals.findIndex((goal) => goal.id === active.id);
       const newIndex = monthlyGoals.findIndex((goal) => goal.id === over.id);
       setMonthlyGoals(arrayMove(monthlyGoals, oldIndex, newIndex));

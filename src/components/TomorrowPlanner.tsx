@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -109,9 +109,9 @@ export default function TomorrowPlanner({ todayTodos, tomorrowTodos, onComplete 
     setMovedTodos(prev => new Set(prev).add(todoId));
   };
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       // Handle reordering of tomorrow's todos if needed
       // For now, we'll just show the moved state
     }
